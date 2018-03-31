@@ -24,6 +24,7 @@ reallocated:
 
   # setup sp
   mv sp, a0
+  addi sp, sp, 1
   slli sp, sp, PGSHIFT
   la t0, boot_kstack
   add sp, sp, t0
@@ -39,9 +40,12 @@ boot_pdpt:
   .space (0x80000000 / PGSIZE / 512 / 512 * 8) - (. - boot_pdpt)
   # map va 2G~3G to pa 2G~3G (temporary)
   .quad 0x80000000 / 4 + (PTE_V | PTE_R | PTE_W | PTE_X)
-  .space (((KERNBASE & SV39_MASK) + 0x80000000) / PGSIZE / 512 / 512 * 8) - (. - boot_pdpt)
-  # map va KERNBASE + (2G~3G) to pa 2G~3G
+  .space ((KERNBASE & SV39_MASK) / PGSIZE / 512 / 512 * 8) - (. - boot_pdpt)
+  # map va KERNBASE + (0G~4G) to pa 0G~4G
+  .quad 0x00000000 / 4 + (PTE_V | PTE_R | PTE_W | PTE_X)
+  .quad 0x40000000 / 4 + (PTE_V | PTE_R | PTE_W | PTE_X)
   .quad 0x80000000 / 4 + (PTE_V | PTE_R | PTE_W | PTE_X)
+  .quad 0xC0000000 / 4 + (PTE_V | PTE_R | PTE_W | PTE_X)
   .space PGSIZE - (. - boot_pdpt)
 
 .section .bss

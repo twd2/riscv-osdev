@@ -11,4 +11,4 @@
 #define PTE_W 4
 #define PTE_X 8
 
-#endif
+#endif // _CONST_H_

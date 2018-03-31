@@ -66,6 +66,7 @@ void init_boothart(uintptr_t hartid, uintptr_t fdt) {
     putchar(i + '0');
     puts(" started.\n");
   }
+  test(fdt);
   for (;;) {
     int ch = sbi_console_getchar();
     if (ch == 3) {
