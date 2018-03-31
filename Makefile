@@ -59,7 +59,7 @@ kernel.elf: kernel.ld init.S.o trap_entry.S.o kmain.c.o spinlock.S.o fdt.c.o
 	$(CC) -c $^ $(CCFLAGS) -o $@
 
 %.S.o: %.S
-	$(AS) $^ -o $@
+	$(C) -c $^ $(CFLAGS) -o $@
 
 %.c.o: %.c
 	$(C) -c $^ $(CFLAGS) -o $@

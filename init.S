@@ -1,13 +1,4 @@
 #include "const.h"
-.set PGSHIFT, 12
-.set MAX_HARTS, 16
-.set PGSIZE, 4096
-.set KERNBASE, 0xffffffc000000000
-.set SV39_MASK, 0x7fffffffff
-.set PTE_V, 1
-.set PTE_R, 2
-.set PTE_W, 4
-.set PTE_X, 8
 
 .section .text, "ax", %progbits
 .globl kernel_entry
