@@ -54,3 +54,7 @@ boot_kstack:
   .space MAX_HARTS * PGSIZE
 boot_kstack_end:
 
+.globl virtq
+virtq:
+.balign PGSIZE
+  .space PGSIZE

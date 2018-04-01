@@ -24,10 +24,10 @@ qemu: image.bin disk.img
 	-smp 4 \
 	-m 1024 \
 	-s \
-	-drive file=disk.img,format=raw,id=hd0 \
-	-device virtio-blk-device,drive=hd0 #\
-#	-netdev type=tap,script=./ifup,downscript=./ifdown,id=net0 \
-#	-device virtio-net-device,netdev=net0
+	-drive file=disk.img,format=raw,cyls=256,heads=4,secs=128,id=hd0 \
+	-device virtio-blk-device,drive=hd0 \
+	-netdev type=user,id=net0 \
+	-device virtio-net-device,netdev=net0
 
 .PHONY: killqemu
 killqeum:
@@ -35,8 +35,7 @@ killqeum:
 
 image.bin: kernel.elf
 	cd riscv-pk && \
-	rm -rf build && \
-	mkdir build && \
+	mkdir -p build && \
 	cd build && \
 	../configure \
 		--disable-fp-emulation \
@@ -69,3 +68,4 @@ clean:
 	-rm kernel.elf kernel.elf.txt
 	-rm *.o
 	-rm *.bin *.img
+	-rm -rf riscv-pk/build

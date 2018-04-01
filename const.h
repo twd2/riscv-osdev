@@ -28,5 +28,11 @@
 #define N_PML4E 512
 #define PML4X_SHIFT (PDPX_SHIFT + 9)
 #define PML4X(x) ((((x) & VA_MASK) >> PML4X_SHIFT) & 0x1ff)
+#define __VA(x) ((void *)((x) + KERNBASE))
+#define __PA(x) ((uintptr_t)((uintptr_t)(x) - KERNBASE))
+
+#define mb() do { asm volatile ("fence"); } while (0)
+#define rmb() do { asm volatile ("fence"); } while (0)
+#define wmb() do { asm volatile ("fence"); } while (0)
 
 #endif // _CONST_H_

@@ -1,6 +1,7 @@
 #include "const.h"
 #include "sbi.h"
 #include "fdt.h"
+#include "test.h"
 
 size_t n_hart = 0;
 static volatile uintptr_t n_boot_hart = 1;
