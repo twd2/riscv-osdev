@@ -1,31 +1,7 @@
 #include "defs.h"
 #include "const.h"
 #include "fdt.h"
-
-size_t strlen(const char *s) {
-  size_t ret = 0;
-  while (*s++) ++ret;
-  return ret;
-}
-
-int strcmp(const char *a, const char *b) {
-  while (*a && *b) {
-    if (*a < *b) return -1;
-    if (*a > *b) return 1;
-    ++a, ++b;
-  }
-  if (!*a && !*b) return 0;
-  if (!*a) return -1;
-  if (!*b) return 1;
-  return 0xdeadbeef;
-}
-
-size_t memset(void *dest, char ch, size_t len) {
-  size_t ret = len;
-  char *d = dest;
-  while (len--) *d++ = ch;
-  return ret;
-}
+#include "string.h"
 
 static inline uint32_t bswap(uint32_t x)
 {

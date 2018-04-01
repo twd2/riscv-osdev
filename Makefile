@@ -51,7 +51,7 @@ image.bin: kernel.elf
 disk.img:
 	dd if=/dev/zero of=disk.img bs=512 count=128k
 
-kernel.elf: kernel.ld init.S.o trap_entry.S.o kmain.c.o test.c.o spinlock.S.o fdt.c.o
+kernel.elf: kernel.ld init.S.o trap_entry.S.o kmain.c.o test.c.o spinlock.S.o fdt.c.o printfmt.c.o string.c.o stdio.c.o
 	$(LD) $(LDFLAGS) -o $@ -T $^
 	$(OBJDUMP) -D $@ > kernel.elf.txt
 

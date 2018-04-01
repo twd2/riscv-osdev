@@ -20,53 +20,39 @@ typedef uintptr_t pte_t;
 
 extern pte_t boot_pdpt[];
 
-void putchar(int ch) {
-  sbi_console_putchar(ch);
-}
-
-void puts(const char *str) {
-  while (*str) {
-    putchar(*str);
-    ++str;
-  }
-}
-
 void hello(uintptr_t hartid) {
-  puts("Hello, world. I'm #");
-  putchar(hartid + '0');
-  puts("!\n");
+  printf("Hello, world. I'm #%lu!\n", hartid);
 }
 
 void init_boothart(uintptr_t hartid, uintptr_t fdt) {
   spinlock_lock(lock);
   hello(hartid);
-  puts("  I'm the boot hart :)\n");
+  puts("  I'm the boot hart :)");
   query_harts(fdt);
-  puts("  There are ");
-  putchar(n_hart + '0');
-  puts(" harts in the system.\n");
+  printf("  There are %lu harts in the system.\n", n_hart);
+  printf("  Flat Device Tree is at %p\n", fdt);
   spinlock_unlock(lock);
 
   // wait for other harts to boot
   while (n_boot_hart != n_hart);
 
   // clear temporary mapping
-  boot_pdpt[0x80000000 / PGSIZE / 512 / 512] = 0;
+  boot_pdpt[PDPX(PHY_MEM_BASE)] = 0;
   // TODO: do more mapping
 
   // other harts are blocked.
   for (int i = 1; i < n_hart; ++i) {
-    puts("Starting kernel hart ");
-    putchar(i + '0');
-    puts(".\n");
+    printf("Starting kernel hart %lu.\n", i);
     done = 0;
     spinlock_unlock(boot_permit); // signal
     while (!done);
-    puts("Kernel hart ");
-    putchar(i + '0');
-    puts(" started.\n");
+    printf("Kernel hart %lu started.\n", i);
   }
   test(fdt);
+  spinlock_lock(lock);
+  puts("System booted successfully! :)");
+  putchar('#');
+  spinlock_unlock(lock);
   for (;;) {
     int ch = sbi_console_getchar();
     if (ch == 3) {
@@ -85,18 +71,21 @@ void init_boothart(uintptr_t hartid, uintptr_t fdt) {
 void init_others(uintptr_t hartid, uintptr_t fdt) {
   spinlock_lock(lock);
   hello(hartid);
-  puts("  I'm not boot hart T_T. Waiting for boot hart...\n");
+  puts("  I'm not boot hart T_T. Waiting for boot hart...");
   ++n_boot_hart;
   asm volatile("fence"); // wmb?
   spinlock_unlock(lock);
   spinlock_lock(boot_permit); // wait for signal
-  puts("Pretend doing something...\n");
+  puts("Pretend doing something...");
   done = 1;
   // TODO: call scheduler
   for (;;) asm volatile("wfi");
 }
 
 void kmain(uintptr_t hartid, uintptr_t fdt) {
+  spinlock_lock(lock);
+  setup_stdio(sbi_console_putchar, sbi_console_getchar);
+  spinlock_unlock(lock);
   if (hartid == 0) {
     init_boothart(hartid, fdt);
   } else {

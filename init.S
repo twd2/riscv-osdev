@@ -5,8 +5,8 @@
 kernel_entry:
   # setup paging
   la t0, boot_pdpt
-  srli t0, t0, 12
-  li t1, 0x8000000000000000 # Sv39
+  srli t0, t0, PGSHIFT
+  li t1, SATP_SV39
   or t0, t0, t1
   csrw satp, t0
 
@@ -37,10 +37,10 @@ reallocated:
 .balign PGSIZE
 .globl boot_pdpt
 boot_pdpt:
-  .space (0x80000000 / PGSIZE / 512 / 512 * 8) - (. - boot_pdpt)
-  # map va 2G~3G to pa 2G~3G (temporary)
-  .quad 0x80000000 / 4 + (PTE_V | PTE_R | PTE_W | PTE_X)
-  .space ((KERNBASE & SV39_MASK) / PGSIZE / 512 / 512 * 8) - (. - boot_pdpt)
+  .space PDPX(PHY_MEM_BASE) * PTE_SIZE - (. - boot_pdpt)
+  # map va PHY_MEM_BASE + (0G~1G) to pa PHY_MEM_BASE + (0G~1G) (temporary)
+  .quad PHY_MEM_BASE / 4 + (PTE_V | PTE_R | PTE_W | PTE_X)
+  .space PDPX(KERNBASE) * PTE_SIZE - (. - boot_pdpt)
   # map va KERNBASE + (0G~4G) to pa 0G~4G
   .quad 0x00000000 / 4 + (PTE_V | PTE_R | PTE_W | PTE_X)
   .quad 0x40000000 / 4 + (PTE_V | PTE_R | PTE_W | PTE_X)
